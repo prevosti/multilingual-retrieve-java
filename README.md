@@ -1,4 +1,6 @@
 # Retrieve and Rank
+[![Build Status](https://travis-ci.org/watson-developer-cloud/retrieve-and-rank-java.svg?branch=master)](https://travis-ci.org/watson-developer-cloud/retrieve-and-rank-java)
+
 The IBM Watson [Retrieve and Rank][service_url] service helps users find the most relevant information for their queries by using a combination of search and machine learning algorithms to detect "signals" in the data. You load your data into the service, which is built on top of Apache Solr, and train a machine learning model. Then use the trained model to provide improved results to users.
 
 Give it a try! Click the button below to fork into IBM DevOps Services and deploy your own copy of this application on Bluemix.  
