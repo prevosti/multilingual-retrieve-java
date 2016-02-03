@@ -1,0 +1,1 @@
+this folder can be deleted and it's just here so that people going to the old url can be redirected to the new one.
