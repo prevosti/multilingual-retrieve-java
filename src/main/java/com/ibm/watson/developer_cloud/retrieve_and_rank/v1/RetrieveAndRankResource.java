@@ -28,6 +28,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 
@@ -41,6 +42,7 @@ import com.ibm.watson.developer_cloud.retrieve_and_rank.v1.payload.QueryResponse
 import com.ibm.watson.developer_cloud.retrieve_and_rank.v1.utils.HttpSolrClientUtils;
 import com.ibm.watson.developer_cloud.retrieve_and_rank.v1.utils.SolrUtils;
 import com.ibm.watson.developer_cloud.service.ServiceResponseException;
+import com.ibm.watson.developer_cloud.util.CredentialUtils;
 
 
 /**
@@ -50,6 +52,8 @@ import com.ibm.watson.developer_cloud.service.ServiceResponseException;
 @Path("/")
 public class RetrieveAndRankResource {
 
+  private static final String BASIC = "Basic ";
+  private static final String RETRIEVE_AND_RANK = "retrieve_and_rank";
   private static Logger logger = Logger.getLogger(RetrieveAndRankResource.class.getName());
 
   private RetrieveAndRank service;
@@ -62,18 +66,27 @@ public class RetrieveAndRankResource {
    */
   public RetrieveAndRankResource() {
     
+    // When running locally you need to provide values for the variables below
+    // WHen running in Bluemix the values will be provided in the environment variables
     String clusterId = System.getenv("CLUSTER_ID");
     String rankerId =  System.getenv("RANKER_ID");
     String collectionName = System.getenv("COLLECTION_NAME");
-    
-    // Service instance
-    this.service = new RetrieveAndRank();
     String username = "USERNAME";
     String password = "PASSWORD";   
     String endPoint = "https://gateway.watsonplatform.net/retrieve-and-rank/api";
 
-    // write your retrieve and rank service credentials below
-    //service.setUsernameAndPassword(username, password);
+    // Get username and password from the VCAP_SERVICES environment variable in Bluemix
+    String apiKey = CredentialUtils.getAPIKey(RETRIEVE_AND_RANK);
+    if (apiKey != null) {
+      // credentials = username:password
+      String[] credentials = new String(Base64.decodeBase64(apiKey.replaceAll(BASIC,""))).split(":");
+      username = credentials[0];
+      password = credentials[1];
+    }
+    
+    // Service instance
+    this.service = new RetrieveAndRank();
+    service.setUsernameAndPassword(username, password);
 
     // Ground truth
     InputStreamReader reader =
@@ -86,7 +99,9 @@ public class RetrieveAndRankResource {
 
     solrUtils = new SolrUtils(solrClient, groundTruth, collectionName, rankerId);
 
-
+    if (clusterId == null || collectionName ==null || rankerId == null)
+      logger.warning("CLUSTER_ID, RANKER_ID and COLLECTION_NAME cannot be null");
+    
     logger.info("RetrieveAndRank service initialized");
   }
 
