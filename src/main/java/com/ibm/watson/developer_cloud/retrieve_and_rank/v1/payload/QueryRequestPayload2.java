@@ -16,10 +16,13 @@ package com.ibm.watson.developer_cloud.retrieve_and_rank.v1.payload;
 /**
  * A payload object used to describe an incoming query from the client.
  */
-public class QueryRequestPayload {
+public class QueryRequestPayload2 {
   
   private String query;
-  private int id = -1;
+
+  public QueryRequestPayload2() {
+
+  }
 
   /**
    * Returns the query which is to be sent to the WDS service.
@@ -37,24 +40,6 @@ public class QueryRequestPayload {
    */
   public void setQuery(String query) {
     this.query = query;
-  }
-
-  /**
-   * Returns the ID of the query to be sent to the service.
-   *
-   * @return returns -1 if the query is not one of the canned queries from the data set
-   */
-  public int getId() {
-    return id;
-  }
-
-  /**
-   * Sets the query id.
-   *
-   * @param queryId the new query id
-   */
-  public void setId(int queryId) {
-    this.id = queryId;
   }
 
 }

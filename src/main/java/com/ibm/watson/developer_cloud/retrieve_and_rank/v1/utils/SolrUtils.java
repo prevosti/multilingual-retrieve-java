@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.ibm.watson.developer_cloud.retrieve_and_rank.v1.RetrieveAndRankResource;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrRequest.METHOD;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -65,11 +66,8 @@ public class SolrUtils {
    * @param solrClient the Solr client
    * @param groundTruth the ground truth
    * @param collectionName the collection name
-   * @param rankerID the ranker id
    */
-  public SolrUtils(HttpSolrClient solrClient, JsonObject groundTruth, String collectionName,
-      String rankerID) {
-    this.rankerId = rankerID;
+  public SolrUtils(HttpSolrClient solrClient, JsonObject groundTruth, String collectionName) {
     this.collectionName = collectionName;
     this.solrClient = solrClient;
     this.groundTruth = groundTruth;
@@ -179,7 +177,7 @@ public class SolrUtils {
     if (featureVector) {
       featureSolrQuery.setRequestHandler(FCSELECT_REQUEST_HANDLER);
       // add the ranker id - this tells the plugin to re-reank the results in a single pass
-      featureSolrQuery.setParam(RANKER_ID, rankerId);
+      //featureSolrQuery.setParam(RANKER_ID, rankerId);
 
     }
 
@@ -219,5 +217,25 @@ public class SolrUtils {
     return idsToDocs;
   }
 
+  public String searchTerm(String term) throws IOException {
+
+    String query = "body:\"" + term + "\"";
+
+    logger.info("Searching for [" + query + "]");
+    final SolrQuery solrQuery = new SolrQuery(query);
+    try {
+      solrQuery.addHighlightField("body");
+      solrQuery.add("hl.fragsize", "50");
+      solrQuery.add("fl", "id,title");
+      final QueryResponse response = solrClient.query(RetrieveAndRankResource.collectionName, solrQuery);
+      logger.info("Found " + response.getResults().size() + " documents!");
+      logger.info(response.getResults().toString());
+      logger.info(response.getHighlighting().toString());
+      logger.info(response.toString());
+      return response.toString();
+    } catch (final SolrServerException e) {
+      throw new RuntimeException("Failed to search!", e);
+    }
+  }
 
 }

@@ -5,7 +5,7 @@ declared-services:
     plan: standard
 applications:
 - services:
-  - retrieve-and-rank-service
-  name: retrieve-and-rank-java
+  - retrieve-and-rank-test
+  name: apv-test-java
   path: target/webApp.war
   memory: 512M
