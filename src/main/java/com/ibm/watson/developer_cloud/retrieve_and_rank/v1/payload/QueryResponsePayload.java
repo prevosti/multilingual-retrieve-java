@@ -18,8 +18,6 @@ import com.ibm.watson.developer_cloud.retrieve_and_rank.v1.model.SolrResult;
  */
 public class QueryResponsePayload {
 
- 
-
   /**
    * number of results returned by Solr
    * 

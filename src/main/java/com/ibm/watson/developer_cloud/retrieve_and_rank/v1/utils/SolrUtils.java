@@ -64,13 +64,11 @@ public class SolrUtils {
   /**
    *
    * @param solrClient the Solr client
-   * @param groundTruth the ground truth
    * @param collectionName the collection name
    */
-  public SolrUtils(HttpSolrClient solrClient, JsonObject groundTruth, String collectionName) {
+  public SolrUtils(HttpSolrClient solrClient, String collectionName) {
     this.collectionName = collectionName;
     this.solrClient = solrClient;
-    this.groundTruth = groundTruth;
   }
 
   /**
@@ -217,7 +215,7 @@ public class SolrUtils {
     return idsToDocs;
   }
 
-  public String searchTerm(String term) throws IOException {
+  public QueryResponse searchTerm(String term) throws IOException {
 
     String query = "body:\"" + term + "\"";
 
@@ -232,7 +230,7 @@ public class SolrUtils {
       logger.info(response.getResults().toString());
       logger.info(response.getHighlighting().toString());
       logger.info(response.toString());
-      return response.toString();
+      return response;
     } catch (final SolrServerException e) {
       throw new RuntimeException("Failed to search!", e);
     }

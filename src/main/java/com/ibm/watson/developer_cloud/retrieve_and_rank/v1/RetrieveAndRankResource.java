@@ -14,8 +14,6 @@
 package com.ibm.watson.developer_cloud.retrieve_and_rank.v1;
 
 import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -32,22 +30,17 @@ import javax.ws.rs.core.Response;
 import com.ibm.watson.developer_cloud.retrieve_and_rank.v1.payload.QueryRequestPayload2;
 import com.ibm.watson.developer_cloud.retrieve_and_rank.v1.payload.QueryResponsePayload2;
 import org.apache.commons.codec.binary.Base64;
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.ibm.watson.developer_cloud.retrieve_and_rank.v1.model.RankResult;
 import com.ibm.watson.developer_cloud.retrieve_and_rank.v1.model.SolrResult;
-import com.ibm.watson.developer_cloud.retrieve_and_rank.v1.model.SolrResults;
-import com.ibm.watson.developer_cloud.retrieve_and_rank.v1.payload.QueryRequestPayload;
-import com.ibm.watson.developer_cloud.retrieve_and_rank.v1.payload.QueryResponsePayload;
 import com.ibm.watson.developer_cloud.retrieve_and_rank.v1.utils.HttpSolrClientUtils;
 import com.ibm.watson.developer_cloud.retrieve_and_rank.v1.utils.SolrUtils;
 import com.ibm.watson.developer_cloud.service.ServiceResponseException;
 import com.ibm.watson.developer_cloud.util.CredentialUtils;
 import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.common.SolrDocument;
+import org.apache.solr.common.SolrDocumentList;
 
 /**
  * Sample application for using the IBM Watson Retrieve and Rank V1 service.
@@ -92,21 +85,16 @@ public class RetrieveAndRankResource {
       username = credentials[0];
       password = credentials[1];
     }
-    
+
     // Service instance
     this.service = new RetrieveAndRank();
     service.setUsernameAndPassword(username, password);
 
-    // Ground truth
-    InputStreamReader reader =
-        new InputStreamReader(getClass().getResourceAsStream("/groundtruth.json"));
-    JsonObject groundTruth = new JsonParser().parse(reader).getAsJsonObject();
-    
     // Solr Client
     HttpSolrClient solrClient = new HttpSolrClient(service.getSolrUrl(clusterId),
         HttpSolrClientUtils.createHttpClient(endPoint, username, password));
 
-    solrUtils = new SolrUtils(solrClient, groundTruth, collectionName);
+    solrUtils = new SolrUtils(solrClient, collectionName);
 
     if (clusterId == null || collectionName ==null)
       logger.warning("CLUSTER_ID, RANKER_ID and COLLECTION_NAME cannot be null");
@@ -125,179 +113,38 @@ public class RetrieveAndRankResource {
     return "pong";
   }
 
-
-  /**
-   * Performs a query against the Solr and then makes a call to rank the results. The order of the
-   * results after both calls is recorded and the returned results are noted in each payload. Once
-   * the ranked results are retrieved a third API call is made to the Solr retrieve service to
-   * retrieve the body (text) for each result. A lookup is performed to get the ground truth
-   * relevance value for each returned result. This lookup would not normally be performed, but as a
-   * goal of this sample application is to show the user how training affects the final results of
-   * the ranker, we return that info also.
-   *
-   * @param body the user query
-   * @return the string
-   * @throws InterruptedException
-   * @throws SolrServerException
-   * @throws IOException
-   */
-//  @POST
-//  @Path("/query")
-//  @Consumes(MediaType.APPLICATION_JSON)
-//  @Produces(MediaType.APPLICATION_JSON)
-//  public Response query(QueryRequestPayload body) {
-//    try {
-//      QueryResponsePayload queryResponse = new QueryResponsePayload();
-//      queryResponse.setQuery(body.getQuery());
-//
-//      SolrResults rankedResults = solrUtils.search(body, true);
-//      queryResponse.setRankedResults(rankedResults.getResult());
-//
-//      SolrResults solrResults = solrUtils.search(body, false);
-//      queryResponse.setSolrResults(solrResults.getResult());
-//      queryResponse.setNumSolrResults(solrResults.getNumberOfResults());
-//
-//
-//
-//      // 1. Collects all the documents ids to retrieve the title and body in a single query
-//      ArrayList<String> idsOfDocsToRetrieve = new ArrayList<>();
-//
-//      for (RankResult answer : queryResponse.getRankedResults()) {
-//        idsOfDocsToRetrieve.add(answer.getAnswerId());
-//        answer.setSolrRank(solrResults.getIds().indexOf(answer.getAnswerId()));
-//      }
-//      for (RankResult answer : queryResponse.getSolrResults()) {
-//        idsOfDocsToRetrieve.add(answer.getAnswerId());
-//        answer.setFinalRank(rankedResults.getIds().indexOf(answer.getAnswerId()));
-//      }
-//
-//      // 2. Query Solr to retrieve document title and body
-//      Map<String, SolrResult> idsToDocs = solrUtils.getDocumentsByIds(idsOfDocsToRetrieve);
-//
-//
-//      // 3. Update the queryResponse with the body and title
-//      for (RankResult answer : queryResponse.getRankedResults()) {
-//        answer.setBody(idsToDocs.get(answer.getAnswerId()).getBody());
-//        answer.setTitle(idsToDocs.get(answer.getAnswerId()).getTitle());
-//      }
-//      for (RankResult answer : queryResponse.getSolrResults()) {
-//        answer.setBody(idsToDocs.get(answer.getAnswerId()).getBody());
-//        answer.setTitle(idsToDocs.get(answer.getAnswerId()).getTitle());
-//      }
-//
-//      return Response.ok(queryResponse).build();
-//    } catch (ServiceResponseException e) {
-//      return Response.status(e.getStatusCode())
-//          .entity(createError(e.getStatusCode(),e.getMessage()))
-//          .build();
-//    } catch (Exception e) {
-//      return Response.status(500)
-//          .entity(createError(500, "Internal Server Error. Did you create and train the service?"))
-//          .build();
-//    }
-//  }
-
-  /**
-   * Performs a query against the Solr and then makes a call to rank the results. The order of the
-   * results after both calls is recorded and the returned results are noted in each payload. Once
-   * the ranked results are retrieved a third API call is made to the Solr retrieve service to
-   * retrieve the body (text) for each result. A lookup is performed to get the ground truth
-   * relevance value for each returned result. This lookup would not normally be performed, but as a
-   * goal of this sample application is to show the user how training affects the final results of
-   * the ranker, we return that info also.
-   *
-   * @param body the user query
-   * @return the string
-   * @throws InterruptedException
-   * @throws SolrServerException
-   * @throws IOException
-   */
-//  @POST
-//  @Path("/query2")
-//  @Consumes(MediaType.APPLICATION_JSON)
-//  @Produces(MediaType.APPLICATION_JSON)
-//  public Response query2(QueryRequestPayload body) {
-//    try {
-//      logger.info("We are in query2");
-//      QueryResponsePayload queryResponse = new QueryResponsePayload();
-//      String query = body.getQuery(); // <--- here is where it explodes
-//      queryResponse.setQuery(query);
-//      logger.info("this is the query [" + query + "]");
-//
-////      SolrResults rankedResults = solrUtils.search(body, true);
-////      queryResponse.setRankedResults(rankedResults.getResult());
-//
-//      SolrResults solrResults = solrUtils.search(body, false);
-//      queryResponse.setSolrResults(solrResults.getResult());
-//      queryResponse.setNumSolrResults(solrResults.getNumberOfResults());
-//      logger.info("# docs: " + solrResults.getNumberOfResults());
-//      logger.info("results: " + solrResults.getResult());
-//
-//      // 1. Collects all the documents ids to retrieve the title and body in a single query
-//      ArrayList<String> idsOfDocsToRetrieve = new ArrayList<>();
-//
-////      for (RankResult answer : queryResponse.getRankedResults()) {
-////        idsOfDocsToRetrieve.add(answer.getAnswerId());
-////        answer.setSolrRank(solrResults.getIds().indexOf(answer.getAnswerId()));
-////      }
-//      for (RankResult answer : queryResponse.getSolrResults()) {
-//        idsOfDocsToRetrieve.add(answer.getAnswerId());
-//        //answer.setFinalRank(rankedResults.getIds().indexOf(answer.getAnswerId()));
-//      }
-//      logger.info("ids to retrieve: " + solrResults.getResult());
-//      // 2. Query Solr to retrieve document title and body
-//      Map<String, SolrResult> idsToDocs = solrUtils.getDocumentsByIds(idsOfDocsToRetrieve);
-//
-//
-//      // 3. Update the queryResponse with the body and title
-////      for (RankResult answer : queryResponse.getRankedResults()) {
-////        answer.setBody(idsToDocs.get(answer.getAnswerId()).getBody());
-////        answer.setTitle(idsToDocs.get(answer.getAnswerId()).getTitle());
-////      }private
-////      for (SolrResult answer : queryResponse.getSolrResults()) {
-////        answer.setBody(idsToDocs.get(answer.getAnswerId()).getBody());
-////        answer.setTitle(idsToDocs.get(answer.getAnswerId()).getTitle());
-////      }
-//
-//      return Response.ok(queryResponse).build();
-//    } catch (ServiceResponseException e) {
-//      return Response.status(e.getStatusCode())
-//              .entity(createError(e.getStatusCode(),e.getMessage()))
-//              .build();
-//    } catch (Exception e) {
-//      return Response.status(500)
-//              .entity(createError(500, "Internal Server Error. Did you create and train the service?"))
-//              .build();
-//    }
-//  }
-
   @POST
   @Path("/query")
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
-  public Response query(QueryRequestPayload2 body) {
+  public Response query(QueryRequestPayload2 payload) {
     try {
       logger.info("We are in query3");
-      String query = body.getQuery();
-      String result = solrUtils.searchTerm(query);
-//
+      String query = payload.getQuery();
+      QueryResponse response = solrUtils.searchTerm(query);
+
 //      String resultJson = "{\"title\":\"some title\", \"body\":\"some body\"}";
 
-//      JsonParser parser = new JsonParser();
-//      JsonObject resultJsonObject = parser.parse(resultJson).getAsJsonObject();
-//      JsonObject out = new JsonObject();
-//      out.addProperty("title", "simple title");
-//      out.addProperty("body", "small body");
-
+      SolrDocumentList results = response.getResults();
+      Map<String, Map<String, List<String>>> highlighting = response.getHighlighting();
+      long numDocs = results.getNumFound();
       QueryResponsePayload2 queryResponse = new QueryResponsePayload2();
-      queryResponse.setNumSolrResults(13);
+      queryResponse.setNumSolrResults((int) numDocs);
       List<SolrResult> solrResults = new ArrayList<>();
-      SolrResult solrResult = new SolrResult();
-      solrResult.setId("123");
-      solrResult.setTitle("sample title");
-      solrResult.setBody(result);
-      solrResults.add(solrResult);
-      queryResponse.setSolrResults(solrResults);
+
+      for(SolrDocument solrDocument: results) {
+        SolrResult solrResult = new SolrResult();
+        String id = (String) solrDocument.getFieldValue("id");
+        solrResult.setId(id);
+        solrResult.setTitle((String) solrDocument.getFieldValue("title"));
+        List<String> bodyContents = highlighting.get(id).get("body");
+        if(bodyContents != null && !bodyContents.isEmpty()) {
+          String body = highlighting.get(id).get("body").get(0);
+          solrResult.setBody(body);
+        }
+        solrResults.add(solrResult);
+        queryResponse.setSolrResults(solrResults);
+      }
 
       logger.info("about to return queryResponse");
       return Response.ok(queryResponse).build();
@@ -306,29 +153,12 @@ public class RetrieveAndRankResource {
       return Response.status(e.getStatusCode())
               .entity(createError(e.getStatusCode(),e.getMessage()))
               .build();
-    } catch (Exception e) {
+     } catch (Exception e) {
       logger.info("Generic Exception:\n" + e);
       return Response.status(500)
-              .entity(createError(500, "Internal Server Error. Did you create and index the collection?"))
+              .entity(createError(500, "Internal Server Error. Did you create and index the collection?\n" + e))
               .build();
     }
-  }
-
-  @GET
-  @Path("/test")
-  @Consumes(MediaType.APPLICATION_JSON)
-  @Produces(MediaType.APPLICATION_JSON)
-  public Response test() {
-    QueryResponsePayload queryResponse = new QueryResponsePayload();
-    queryResponse.setNumSolrResults(13);
-    List<SolrResult> solrResults = new ArrayList<>();
-    SolrResult solrResult = new SolrResult();
-    solrResult.setId("123");
-    solrResult.setTitle("sample title");
-    solrResult.setBody("small body");
-    solrResults.add(solrResult);
-    queryResponse.setSolrResults(solrResults);
-    return Response.ok(queryResponse).build();
   }
 
   /**
