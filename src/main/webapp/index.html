@@ -1,4 +1,5 @@
-<html><head>
+<html>
+<head>
     <title>Multilingual Retrieve Test</title>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -40,6 +41,7 @@
         </nav>
     </div>
 </header>
+
 <div class="_demo--banner">
     <div class="_demo--container">
         <div class="banner--service-info">
@@ -49,22 +51,75 @@
             </h1>
             <div class="banner--service-description">
                 This demo allows you to run queries against the retrieve and rank service in different languages.
-                Pick the language of your choice.
+                Pick the language of your choice and run your queries.
             </div>
         </div>
     </div>
 </div>
 
-
-
 <div class="_demo--container">
     <article class="_content base--article">
-        <div class="_content--choose-input-file">
-            <h2 id="top2" class="base--h2">Run a query</h2>
+        <div id="choose-language">
+            <h2 id="top2" class="base--h2">Pick a language</h2>
+        </div>
+        <div class="_content--sample">
+            <div class="sample--list-item">
+                <div class="sample--list-item-tab" id="lang_en">
+                    <span class="language--english">English</span>
+                </div>
+            </div>
+            <div class="sample--list-item">
+                <div class="sample--list-item-tab" id="lang_es">
+                    <span class="language--spanish">Spanish</span>
+                </div>
+            </div>
+            <div class="sample--list-item">
+                <div class="sample--list-item-tab" id="lang_br">
+                    <span class="language--spanish">Brazilian Portuguese</span>
+                </div>
+            </div>
+            <div class="sample--list-item">
+                <div class="sample--list-item-tab" id="lang_it">
+                    <span class="language--spanish">Italian</span>
+                </div>
+            </div>
+            <div class="sample--list-item">
+                <div class="sample--list-item-tab" id="lang_fr">
+                    <span class="language--spanish">French</span>
+                </div>
+            </div>
+            <div class="sample--list-item">
+                <div class="sample--list-item-tab" id="lang_jp">
+                    <span class="language--spanish">Japanese</span>
+                </div>
+            </div>
+            <div class="sample--list-item">
+                <div class="sample--list-item-tab" id="lang_de">
+                    <span class="language--german">German</span>
+                </div>
+            </div>
+            <div class="sample--list-item">
+                <div class="sample--list-item-tab" id="lang_ar">
+                    <span class="language--spanish">Arabic</span>
+                </div>
+            </div>
+        </div>
+
+        <div id="run--query">
+            <h2 id="top3" class="base--h2">Run a query</h2>
         </div>
         <div class="input">
-          <input autofocus="autofocus" size="45" style="height:40px;font-size:14pt;" id="user-query" type="text">
-          <input class="input--search-button" style="height:30px;font-size:12pt;" type="button" value="Search">
+            <table>
+                <tr>
+                    <td>
+                        <input autofocus="autofocus" size="45" style="height:40px;font-size:14pt;" id="user-query" type="text">
+                    </td>
+                    <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                    <td>
+                        <input class="input--search-button" style="height:30px;font-size:12pt;" type="button" value="Search">
+                    </td>
+                </tr>
+             </table>
         </div>
     </article>
 </div>
@@ -75,55 +130,8 @@
     </div>
 </div>
 
-
-<div class="output" style="display: none;">
-    <div class="_demo--container">
-        <h3 class="base--h3">Output</h3>
-        <p class="base--p">
-            You can compare the machine learning approach (Retrieve and Rank) and the standard search results (Solr).
-        </p>
-
-        <div id="output--debug-messages">print messages here</div>
-
-        <div class="toggle">
-            <div class="toggle--item active">Machine learning approach</div>
-        </div>
-        <div class="service--results"></div>
-        <div class="toggle">
-            <div class="toggle--item active">Standard search</div>
-        </div>
-        <div class="standard--results"></div>
-    </div>
-</div>
-
-<div class="results--item result--template" style="display:none;">
-    <div class="results--item-container">
-        <div class="results--item-rank">
-            <span class="results--increase-icon icon"></span>
-            <span class="results--increase-value "></span>
-        </div>
-        <div class="results--basic-info">
-            <div class="results--item-text">
-                <span class="icon icon-see_query.query more results--see-more"></span>
-            </div>
-            <div class="results--item-score">
-                <div class="results--item-score-title"> Domain expert review</div>
-                <div class="results--item-score-value">
-                    <div class="results--item-score-bar"></div>
-                    <div class="results--item-score-bar"></div>
-                    <div class="results--item-score-bar"></div>
-                    <div class="results--item-score-bar"></div>
-                </div>
-            </div>
-        </div>
-        <div class="results--more-info" style="display: none;">
-            <blockquote class="results--item-details base--blockquote">
-            </blockquote>
-        </div>
-    </div>
-</div>
-
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
 <script type="text/javascript" src="js/demo2.js"></script>
 
-</body></html>
+</body>
+</html>

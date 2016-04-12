@@ -1,4 +1,7 @@
 $(document).ready(function() {
+
+  var lang = "multilingual_english_collection";
+
   var $searchResultsHeader = $('.search--results--header');
 
   $('.input--search-button').click(function() {
@@ -14,7 +17,9 @@ $(document).ready(function() {
   function runQuery() { 
     console.log( "the search button was pressed!" );
 
-    var queryText = "{\"query\":\"" + $('#user-query').val() + "\"}";
+    var collectionName = $('#chosen--language').val()
+    var queryText = "{\"query\":\"" + $('#user-query').val() + "\",\"collectionName\":\"" + lang + "\"}";
+
     console.log( "this is query that will be executed: " + queryText );
 
     var jsonQuery = JSON.parse(queryText);
@@ -52,5 +57,61 @@ $(document).ready(function() {
 
      request.always(function() {} );
   }
-});
 
+    $('#lang_en').click(function() {
+      $('.sample--list-item-tab.active').removeClass('active');
+      $('.sample--list-item-tab:eq(0)').addClass('active');
+
+      lang = "multilingual_english_collection";
+    });
+
+    $('#lang_es').click(function() {
+      $('.sample--list-item-tab.active').removeClass('active');
+      $('.sample--list-item-tab:eq(1)').addClass('active');
+
+      lang = "multilingual_spanish_collection";
+    });
+
+    $('#lang_br').click(function() {
+      $('.sample--list-item-tab.active').removeClass('active');
+      $('.sample--list-item-tab:eq(2)').addClass('active');
+
+      lang = "multilingual_brazilianportuguese_collection";
+    });
+
+    $('#lang_it').click(function() {
+      $('.sample--list-item-tab.active').removeClass('active');
+      $('.sample--list-item-tab:eq(3)').addClass('active');
+
+      lang = "multilingual_italian_collection";
+    });
+
+    $('#lang_fr').click(function() {
+      $('.sample--list-item-tab.active').removeClass('active');
+      $('.sample--list-item-tab:eq(4)').addClass('active');
+
+      lang = "multilingual_french_collection";
+    });
+
+    $('#lang_jp').click(function() {
+      $('.sample--list-item-tab.active').removeClass('active');
+      $('.sample--list-item-tab:eq(5)').addClass('active');
+
+      lang = "multilingual_japanese_collection";
+    });
+
+    $('#lang_de').click(function() {
+      $('.sample--list-item-tab.active').removeClass('active');
+      $('.sample--list-item-tab:eq(6)').addClass('active');
+
+      lang = "multilingual_german_collection";
+    });
+
+    $('#lang_ar').click(function() {
+      $('.sample--list-item-tab.active').removeClass('active');
+      $('.sample--list-item-tab:eq(7)').addClass('active');
+
+      lang = "multilingual_arabic_collection";
+    });
+
+});

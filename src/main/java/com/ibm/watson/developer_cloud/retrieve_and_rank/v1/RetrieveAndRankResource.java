@@ -49,7 +49,6 @@ import org.apache.solr.common.SolrDocumentList;
 @Path("/")
 public class RetrieveAndRankResource {
 
-  public static final String collectionName = "YOUR_COLLECTION_NAME_HERE";
   private static final String clusterId = "YOUR_CLUSTER_ID_HERE";
   private static String username = "YOUR_USERNAME_HERE";
   private static String password = "YOUR_PASSWORD_HERE";
@@ -69,11 +68,9 @@ public class RetrieveAndRankResource {
   public RetrieveAndRankResource() {
     // When running locally you need to provide values for the variables below
     // WHen running in Bluemix the values will be provided in the environment variables
-    //String collectionName = System.getenv("COLLECTION_NAME");
     //String clusterId = System.getenv("CLUSTER_ID");
 
     logger.info("CLUSTER_ID:" + clusterId);
-    logger.info("COLLECTION_NAME:" + collectionName);
 
     String endPoint = "https://gateway.watsonplatform.net/retrieve-and-rank/api";
 
@@ -94,11 +91,11 @@ public class RetrieveAndRankResource {
     HttpSolrClient solrClient = new HttpSolrClient(service.getSolrUrl(clusterId),
         HttpSolrClientUtils.createHttpClient(endPoint, username, password));
 
-    solrUtils = new SolrUtils(solrClient, collectionName);
+    solrUtils = new SolrUtils(solrClient);
 
-    if (clusterId == null || collectionName ==null)
-      logger.warning("CLUSTER_ID, RANKER_ID and COLLECTION_NAME cannot be null");
-    
+    if (clusterId == null)
+      logger.warning("CLUSTER_ID cannot be null");
+
     logger.info("RetrieveAndRank service initialized");
   }
 
@@ -119,9 +116,10 @@ public class RetrieveAndRankResource {
   @Produces(MediaType.APPLICATION_JSON)
   public Response query(QueryRequestPayload2 payload) {
     try {
-      logger.info("We are in query3");
+      logger.info("We are in query");
       String query = payload.getQuery();
-      QueryResponse response = solrUtils.searchTerm(query);
+      String collectionName = payload.getCollectionName();
+      QueryResponse response = solrUtils.searchTerm(query, collectionName);
 
 //      String resultJson = "{\"title\":\"some title\", \"body\":\"some body\"}";
 

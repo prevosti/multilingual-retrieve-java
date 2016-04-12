@@ -19,27 +19,23 @@ package com.ibm.watson.developer_cloud.retrieve_and_rank.v1.payload;
 public class QueryRequestPayload2 {
   
   private String query;
+  private String collectionName;
 
-  public QueryRequestPayload2() {
+  public QueryRequestPayload2() { }
 
-  }
-
-  /**
-   * Returns the query which is to be sent to the WDS service.
-   *
-   * @return the query
-   */
   public String getQuery() {
     return query;
   }
 
-  /**
-   * Sets the query.
-   *
-   * @param query the new query
-   */
   public void setQuery(String query) {
     this.query = query;
   }
 
+  public String getCollectionName() {
+    return collectionName;
+  }
+
+  public void setCollectionName(String collectionName) {
+    this.collectionName = collectionName;
+  }
 }
