@@ -17,6 +17,8 @@ $(document).ready(function() {
   function runQuery() { 
     console.log( "the search button was pressed!" );
 
+    setTextDirection();
+
     var collectionName = $('#chosen--language').val()
     var queryText = "{\"query\":\"" + $('#user-query').val() + "\",\"collectionName\":\"" + lang + "\"}";
 
@@ -56,6 +58,15 @@ $(document).ready(function() {
     });
 
      request.always(function() {} );
+  }
+
+  function setTextDirection() {
+     var lang2 = $('.sample--list-item-tab.active').attr('id');
+     if(lang2 == "lang_ar") {
+       $('.search--results--header').attr('dir', 'rtl');
+     } else {
+       $('.search--results--header').removeAttr('dir');
+     }
   }
 
     $('#lang_en').click(function() {
