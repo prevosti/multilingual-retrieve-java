@@ -119,7 +119,7 @@ public class RetrieveAndRankResource {
       logger.info("We are in query");
       String query = payload.getQuery();
       String collectionName = payload.getCollectionName();
-      QueryResponse response = solrUtils.searchTerm(query, collectionName);
+      QueryResponse response = solrUtils.searchTerms(query, collectionName);
 
 //      String resultJson = "{\"title\":\"some title\", \"body\":\"some body\"}";
 

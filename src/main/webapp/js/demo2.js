@@ -22,7 +22,7 @@ $(document).ready(function() {
     var collectionName = $('#chosen--language').val()
     var queryText = "{\"query\":\"" + $('#user-query').val() + "\",\"collectionName\":\"" + lang + "\"}";
 
-    console.log( "this is query that will be executed: " + queryText );
+    console.log( "this is the query that will be executed: " + queryText );
 
     var jsonQuery = JSON.parse(queryText);
 

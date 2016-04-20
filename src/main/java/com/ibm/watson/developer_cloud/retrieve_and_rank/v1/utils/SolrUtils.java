@@ -35,13 +35,14 @@ public class SolrUtils {
     this.solrClient = solrClient;
   }
 
-  public QueryResponse searchTerm(String term, String collectionName) throws IOException {
+  public QueryResponse searchTerms(String terms, String collectionName) throws IOException {
 
-    String query = "body:\"" + term + "\"";
-
+    String query = "body:(" + terms + ") OR title:(" + terms + ")";
     logger.info("Searching for [" + query + "]");
     final SolrQuery solrQuery = new SolrQuery(query);
     try {
+      solrQuery.add("q.op", "AND");
+      solrQuery.add("df", "body");
       solrQuery.addHighlightField("body");
       solrQuery.add("hl.fragsize", "300");
       solrQuery.add("fl", "id,title");
